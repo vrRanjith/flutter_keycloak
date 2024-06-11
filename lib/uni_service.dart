@@ -10,7 +10,7 @@ class UniServices {
 
   static void reset() => _code = '';
 
-  static Future<void> init() async {
+  static init() async {
     try {
       final Uri? uri = await getInitialUri();
       if (uri != null) {
@@ -31,8 +31,10 @@ class UniServices {
   }
 
   // Modified: Function to handle the received URI
-  static void _handleUri(Uri uri) {
-    if (uri.queryParameters.isEmpty) return;
+  static _handleUri(Uri? uri) {
+    if (uri == null || uri.queryParameters.isEmpty) return;
+
+    Map<String, String> param = uri.queryParameters;
 
     String receivedCode = uri.queryParameters['code'] ?? '';
 

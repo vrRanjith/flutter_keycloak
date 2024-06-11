@@ -26,6 +26,9 @@ class _MyAppState extends State<MyApp> {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
+      routes: {
+        '/': (_) => WelcomePage(),
+      },
       home: WelcomePage(), // Display the WelcomePage as the initial screen
     );
   }
