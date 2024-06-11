@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter_keycloak/context_utility.dart';
+import 'package:flutter_keycloak/uni_service.dart';
 import 'package:uni_links/uni_links.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:async';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  // await UniServices.init(); // Ensure UniServices is initialized
   runApp(MyApp());
 }
 
@@ -14,54 +18,15 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  StreamSubscription? _sub;
-
-  @override
-  void initState() {
-    super.initState();
-    initDeepLinkHandler();
-  }
-
-  @override
-  void dispose() {
-    _sub?.cancel();
-    super.dispose();
-  }
-
-  void initDeepLinkHandler() {
-    _sub = linkStream.listen((String? link) {
-      if (link != null) {
-        handleDeepLink(Uri.parse(link));
-      }
-    }, onError: (err) {
-      // Handle exception
-      print('Error occurred while handling deep link: $err');
-    });
-  }
-
-  void handleDeepLink(Uri uri) {
-    if (uri.scheme == 'myapp' && uri.host == 'callback') {
-      final token = uri.queryParameters['code'];
-
-      if (token != null) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => HomePage(token: token),
-          ),
-        );
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: ContextUtility.navigatorKey,
       title: 'Flutter Keycloak Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: WelcomePage(),
+      home: WelcomePage(), // Display the WelcomePage as the initial screen
     );
   }
 }
@@ -89,7 +54,7 @@ class WelcomePage extends StatelessWidget {
             ElevatedButton(
               child: Text('Login'),
               onPressed: () {
-                _launchURL(context);
+                _launchURL(context); // Modified: Calls _launchURL to handle login
               },
             ),
           ],
@@ -98,16 +63,17 @@ class WelcomePage extends StatelessWidget {
     );
   }
 
+  // Modified: Function to launch the Keycloak URL for login
   _launchURL(BuildContext context) async {
-  final url =
-      'https://sso.sandbox.kezel.io/realms/kezel/protocol/openid-connect/auth?client_id=kezel&redirect_uri=http://192.168.29.242:3000/&response_type=code&scope=openid%20profile%20email';
-  final uri = Uri.parse(url);
-  if (await canLaunchUrl(uri)) {
-    await launchUrl(uri);
-  } else {
-    throw 'Could not launch $url';
+    final url =
+        'https://sso.sandbox.kezel.io/realms/kezel/protocol/openid-connect/auth?client_id=kezel&redirect_uri=https://react-redirect-server.onrender.com/&response_type=code&scope=openid%20profile%20email';
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    } else {
+      throw 'Could not launch $url';
+    }
   }
-}
 }
 
 class RegistrationPage extends StatefulWidget {
