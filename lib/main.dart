@@ -8,7 +8,7 @@ import 'dart:async';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // await UniServices.init(); // Ensure UniServices is initialized
+  await UniServices.init(); // Ensure UniServices is initialized
   runApp(MyApp());
 }
 
